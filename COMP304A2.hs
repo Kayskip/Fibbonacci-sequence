@@ -1,3 +1,7 @@
+-- @author Karu Skipper
+-- ID: 300417869
+-- Assignment 2 : More Haskell
+
 ------------------------------------------------------------
 ------------------ 1.1 Recursive Function ------------------
 ------------------------------------------------------------
@@ -87,21 +91,46 @@ hasKey function:
 -- Empty list of keys that contain items still, return false BECAUSE IT DOESNT HAVE ANY KEYS
 -- Simple loop of the list of keys, recursing and keeping the value and checking to see if the key exists
 -- if it does return true, if not keep recursing on the list with the rest of the list
+-- the empty key lists && EmptyDict are covered in the function rather than the tests
 --}
 
 hasKey :: Eq a => Dict a b -> a -> Bool
-hasKey EmptyDict a = False 
-hasKey (Dict [] x) y = False 
+hasKey EmptyDict x = False 
+hasKey (Dict [] y) z = False 
 hasKey (Dict (x:xs) y) z
                        | x /= z = hasKey (Dict xs y) z
                        | otherwise = True
 
+t1hasKey = hasKey (Dict [1,2,3] ['a','b','c']) 1
+t2hasKey = hasKey (Dict [1,2,3] ['a','b','c']) 5
+t3hasKey = hasKey (Dict [] ['a','b','c']) 3
+t4hasKey = hasKey (Dict [1,2,3] []) 1
+t5hasKey = hasKey (Dict [1,2,3] []) (-1)
+testhasKey = [t1hasKey,t2hasKey == False,t3hasKey == False,t4hasKey,t5hasKey == False]
+
+{--
+-- getValue function:
+-- getValue takes 3 parameters, the keys, values and value we are returning
+-- Empty Dictionary check
+-- Empty list of keys that contain items still, return false BECAUSE IT DOESNT HAVE ANY KEYS
+-- Simple loop of the list of keys, recursing and keeping the value and checking to see if the key exists
+-- if it does return true, if not keep recursing on the list with the rest of the list
+-- the empty key lists && EmptyDict are covered in the function rather than the tests
+--}
+
 getValue :: Eq a => Dict a b -> a -> b
-getValue EmptyDict a = error "Empty"
-getValue (Dict [] y) a = error "Key is not present"
-getValue (Dict (x:xs) (y:ys)) a
-                              | x == a = y
-                              | otherwise = getValue (Dict xs ys) a
+getValue EmptyDict x = error "Empty Dictionary"
+getValue (Dict [] y) z = error "Key is not found"
+getValue (Dict (x:xs) (y:ys)) z
+                              | x /= z = getValue (Dict xs ys) z
+                              | otherwise = y
+
+t1getValue = getValue (Dict [1,2,3] ['a','b','c']) 1 == 'a'
+t2getValue = getValue (Dict [1,2,3] ['a','b','c']) 2 == 'b'
+t3getValue = getValue (Dict [1,2,3] ['a','b','c']) 1 /= 'd'
+testgetValue = [t1getValue,t2getValue,t3getValue]
+
+
 
 withKeyValue :: Eq a => Dict a b -> a -> b -> Dict a b
 withKeyValue (Dict x y) a b
