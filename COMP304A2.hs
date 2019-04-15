@@ -15,6 +15,11 @@ fiboN n | n == 0 = 0
         | n > 1 = fiboN (n-1) + fiboN (n-2)
         | otherwise = error"fibo : Illegal Argument"
 
+t1fiboN = fiboN 0 == 0
+t2fiboN = fiboN 5 == 5
+t3fiboN = fiboN 1 == 1
+        
+testfiboN = [t1fiboN,t2fiboN,t3fiboN]
 ------------------------------------------------------------
 ------------------ 1.2 Fibonacci Stream --------------------
 ------------------------------------------------------------
@@ -22,6 +27,7 @@ fiboN n | n == 0 = 0
 {--
 fiboStream function:
 calls the helpStream function, parsing 0 1 to start the sequences
+        --access using fiboStream!!n
 --}
 
 fiboStream :: [Integer]
@@ -39,6 +45,8 @@ this results in the fibo sequence as a stream.
 helperStream :: Integer -> Integer -> [Integer]
 helperStream a b = a : helperStream b (a + b)
 
+t1helperStream = helperStream 0 1 /= []
+testhelperStream = [t1helperStream]
 ------------------------------------------------------------
 ------------------ 1.3 Performance -------------------------
 ------------------------------------------------------------
@@ -58,25 +66,54 @@ calculation stage of your fibo number.
 ------------------ 2 Dictionary Implementation -------------
 ------------------------------------------------------------
 
-data Dict a b = EmptyDict | Top a b (Dict a b) 
+{--
+Dict type takes key and value, here it can either be an empty dict
+or a Dict that takes a list of keys and a list of values
+--}
+
+data Dict key value = EmptyDict | Dict [key] [value]
+
+{--
+This emptyDict is extracted from (originally a stack implementation)
+--}
+
 emptyDict :: Dict a b
 emptyDict = EmptyDict
 
 {--
-comp :: Eq a => (Potential a) -> (Potential a) -> Bool
-comp (Value x) (Value y) = (x == y)
+hasKey function:
+-- hasKey takes 3 parameters, the keys, values and key we are checking
+-- Empty list check
+-- Empty list of keys that contain items still, return false BECAUSE IT DOESNT HAVE ANY KEYS
+-- Simple loop of the list of keys, recursing and keeping the value and checking to see if the key exists
+-- if it does return true, if not keep recursing on the list with the rest of the list
+--}
 
 hasKey :: Eq a => Dict a b -> a -> Bool
+hasKey EmptyDict a = False 
+hasKey (Dict [] x) y = False 
+hasKey (Dict (x:xs) y) z
+                       | x /= z = hasKey (Dict xs y) z
+                       | otherwise = True
 
---check if a given key is present in a dictionary
-hasKey =
 getValue :: Eq a => Dict a b -> a -> b
---get the value of a given key in a dictionary
+getValue EmptyDict a = error "Empty"
+getValue (Dict [] y) a = error "Key is not present"
+getValue (Dict (x:xs) (y:ys)) a
+                              | x == a = y
+                              | otherwise = getValue (Dict xs ys) a
+
 withKeyValue :: Eq a => Dict a b -> a -> b -> Dict a b
---add a new key-value pair to a dictionary
+withKeyValue (Dict x y) a b
+                          | (hasKey (Dict x y) a) == True = withKeyValue (withoutKey (Dict x y) a) a b
+                          | otherwise = Dict (x++[a]) (y++[b])
+
 withoutKey :: Eq a => Dict a b -> a -> Dict a b
---remove a key-value pair from a dictionary
---}
+withoutKey (Dict (x:xs) (y:ys)) a
+                                | x == a = Dict xs ys
+                                | (hasKey (Dict xs ys) a) == True = withoutKey (Dict (xs++[x]) (ys++[y])) a 
+                                | otherwise = error "Key is not present"
+
 
 ------------------------------------------------------------
 ------------------ Extra Code ------------------------------
